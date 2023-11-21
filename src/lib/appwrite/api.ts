@@ -62,7 +62,7 @@ export async function saveUserToDB(user: {
 export async function signInAccount(user: { email: string; password: string }) {
   try {
     const session = await account.createEmailSession(user.email, user.password);
-
+    localStorage.setItem("sessionId", session.userId); //userId stored as a sessionId -> purpose of storing is after some time of user log in, when try to fetch useId on reload the appWrite is unable to fetch resulting 401
     return session;
   } catch (error) {
     console.log(error);
@@ -70,46 +70,43 @@ export async function signInAccount(user: { email: string; password: string }) {
 }
 
 // ============================== GET ACCOUNT
-export async function getAccount() {
-  try {
-    const currentAccount = await account.get();
-
-    return currentAccount;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// ============================== GET USER
-export async function getCurrentUser() {
-  try {
-    const currentAccount = await getAccount();
-
-    if (!currentAccount) throw Error;
-
-    const currentUser = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.userCollectionId[
-        Query.equal("accountId", currentAccount.$id)
-      ]
-    );
-
-    if (!currentUser) throw Error;
-
-    return currentUser.documents[0];
-  } catch (error) {
-    console.log(error);
-    // return null;
-  }
-}
-
-// ============================== SIGN OUT
-// export async function signOutAccount() {
+// export async function getAccount() {
 //   try {
-//     const session = await account.deleteSession("current");
+//     const currentAccountId = localStorage.getItem("sessionId");
 
-//     return session;
+//     return currentAccount;
 //   } catch (error) {
 //     console.log(error);
 //   }
 // }
+
+// ============================== GET USER
+export async function getCurrentUser() {
+  try {
+    const currentAccountId = localStorage.getItem("sessionId");
+
+    if (currentAccountId !== null) {
+      const currentUser = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.userCollectionId,
+        [Query.equal("accountId", currentAccountId)]
+      );
+
+      if (!currentUser) throw Error;
+      return currentUser.documents[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== SIGN OUT
+export async function signOutAccount() {
+  try {
+    localStorage.clear();
+    const session = await account.deleteSession("current");
+    return session;
+  } catch (error) {
+    console.log(error);
+  }
+}
