@@ -26,7 +26,7 @@ import {
   updateUser,
 } from "../appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
-import { QUERY_KEYS } from "./queryKeys";
+import { QUERY_KEYS } from "./queryKey";
 
 
 

@@ -7,51 +7,34 @@ export function cn(...inputs: ClassValue[]) {
 
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
 
-export function formatDateString(dateString: string) {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  };
+export function getRelativeTime(timestamp: string) {
+  const currentDate = new Date();
+  const inputDate = new Date(timestamp);
 
-  const date = new Date(dateString);
-  const formattedDate = date.toLocaleDateString("en-US", options);
+  const elapsed = currentDate.getTime() - inputDate.getTime();
+  const seconds = Math.floor(elapsed / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
 
-  const time = date.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-  return `${formattedDate} at ${time}`;
-}
-
-// 
-export const multiFormatDateString = (timestamp: string = ""): string => {
-  const timestampNum = Math.round(new Date(timestamp).getTime() / 1000);
-  const date: Date = new Date(timestampNum * 1000);
-  const now: Date = new Date();
-
-  const diff: number = now.getTime() - date.getTime();
-  const diffInSeconds: number = diff / 1000;
-  const diffInMinutes: number = diffInSeconds / 60;
-  const diffInHours: number = diffInMinutes / 60;
-  const diffInDays: number = diffInHours / 24;
-
-  switch (true) {
-    case Math.floor(diffInDays) >= 30:
-      return formatDateString(timestamp);
-    case Math.floor(diffInDays) === 1:
-      return `${Math.floor(diffInDays)} day ago`;
-    case Math.floor(diffInDays) > 1 && diffInDays < 30:
-      return `${Math.floor(diffInDays)} days ago`;
-    case Math.floor(diffInHours) >= 1:
-      return `${Math.floor(diffInHours)} hours ago`;
-    case Math.floor(diffInMinutes) >= 1:
-      return `${Math.floor(diffInMinutes)} minutes ago`;
-    default:
-      return "Just now";
+  if (weeks > 4) {
+    // More than a month, return the full date
+    return inputDate.toLocaleDateString("en-IN");
+  } else if (days > 7) {
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  } else if (days > 0) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else if (seconds > 0) {
+    return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+  } else {
+    return "just now";
   }
-};
+}
 
 export const checkIsLiked = (likeList: string[], userId: string) => {
   return likeList.includes(userId);
