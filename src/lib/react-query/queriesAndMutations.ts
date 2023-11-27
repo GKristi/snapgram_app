@@ -169,10 +169,11 @@ export const useLikePost = () => {
 
 export const useSavePost = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ userId, postId }: { userId: string; postId: string }) =>
-      savePost(userId, postId),
-    onSuccess: () => {
+    mutationFn: ({ postId, userId }: { postId: string; userId: string }) =>
+      savePost(postId, userId),
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
       });
@@ -180,7 +181,7 @@ export const useSavePost = () => {
         queryKey: [QUERY_KEYS.GET_POSTS],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER, data?.$id],
       });
     },
   });
@@ -188,6 +189,7 @@ export const useSavePost = () => {
 
 export const useDeleteSavedPost = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (savedRecordId: string) => deleteSavedPost(savedRecordId),
     onSuccess: () => {

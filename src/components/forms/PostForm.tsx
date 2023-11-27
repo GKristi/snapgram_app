@@ -33,7 +33,7 @@ type PostFormProps = {
 const PostForm = ({ post, action }: PostFormProps) => {
   const { mutateAsync: createPost, isPending: isLoadingCreate } =
     useCreatePost();
-  const { mutateAsync: updatepost, isPending: isLoadingupdate } =
+  const { mutateAsync: updatepost, isPending: isLoadingUpdate } =
     useUpdatePost();
   const { user } = useUserContext();
   const { toast } = useToast();
@@ -89,30 +89,30 @@ const PostForm = ({ post, action }: PostFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-9 w-full max-w-5xl"
+        className='flex flex-col gap-9 w-full max-w-5xl'
       >
         <FormField
           control={form.control}
-          name="caption"
+          name='caption'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Caption</FormLabel>
+              <FormLabel className='shad-form_label'>Caption</FormLabel>
               <FormControl>
                 <Textarea
-                  className="shad-textarea custom-scrollbar"
+                  className='shad-textarea custom-scrollbar'
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className='shad-form_message' />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="file"
+          name='file'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add Photos</FormLabel>
+              <FormLabel className='shad-form_label'>Add Photos</FormLabel>
               <FormControl>
                 <FileUploader
                   fieldChange={field.onChange}
@@ -120,61 +120,58 @@ const PostForm = ({ post, action }: PostFormProps) => {
                   // isVideo={post?.isVideo}
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className='shad-form_message' />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="location"
+          name='location'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add Location</FormLabel>
+              <FormLabel className='shad-form_label'>Add Location</FormLabel>
               <FormControl>
-                <Input type="text" className="shad-input" {...field} />
+                <Input type='text' className='shad-input' {...field} />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className='shad-form_message' />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="tags"
+          name='tags'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">
+              <FormLabel className='shad-form_label'>
                 Add Tags (seperated by comma " , ")
               </FormLabel>
               <FormControl>
                 <Input
-                  type="text"
-                  className="shad-input"
-                  placeholder="Art, Expression, Learn"
+                  type='text'
+                  className='shad-input'
+                  placeholder='Art, Expression, Learn'
                   {...field}
                 />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className='shad-form_message' />
             </FormItem>
           )}
         />
-        <div className="flex gap-4 items-center justify-end">
-          <Button type="button" className="shad-button_dark_4">
+        <div className='flex gap-4 items-center justify-end'>
+          <Button
+            type='button'
+            className='shad-button_dark_4'
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </Button>
           <Button
-            type="submit"
-            className="shad-button_primary whitespace-nowrap"
-            disabled = {isLoadingCreate || isLoadingupdate}
+            type='submit'
+            className='shad-button_primary whitespace-nowrap'
+            disabled={isLoadingCreate || isLoadingUpdate}
           >
-            {/* {isLoadingCreate || isLoadingupdate && 'Loading... '}
-            {action} Post */}
-            {isLoadingCreate || isLoadingupdate ? (
-              <div className="flex-center gap-2">
-                <Loader /> {isLoadingCreate ? "Creating Post..." : "Updating Post..."}
-              </div>
-            ) : (
-              action + " Post"
-            )}
+            {(isLoadingCreate || isLoadingUpdate) && <Loader />}
+            {action} Post
           </Button>
         </div>
       </form>
