@@ -31,65 +31,63 @@ type PostFormProps = {
 };
 
 const PostForm = ({ post, action }: PostFormProps) => {
-  const { mutateAsync: createPost, isPending: isLoadingCreate } =
-    useCreatePost();
-  const { mutateAsync: updatepost, isPending: isLoadingUpdate } =
-    useUpdatePost();
-  const { user } = useUserContext();
-  const { toast } = useToast();
   const navigate = useNavigate();
-
+  const { toast } = useToast();
+  const { user } = useUserContext();
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
       caption: post ? post?.caption : "",
       file: [],
-      location: post ? post?.location : "",
+      location: post ? post.location : "",
       tags: post ? post.tags.join(",") : "",
     },
   });
 
-  // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof PostValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // console.log(values);
+  // Query
+  const { mutateAsync: createPost, isPending: isLoadingCreate } =
+    useCreatePost();
+  const { mutateAsync: updatePost, isPending: isLoadingUpdate } =
+    useUpdatePost();
 
+  // Handler
+  const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
+    // ACTION = UPDATE
     if (post && action === "Update") {
-      const updatedPost = await updatepost({
-        ...values,
+      const updatedPost = await updatePost({
+        ...value,
         postId: post.$id,
-        imageId: post?.imageId,
-        imageUrl: post?.imageUrl,
+        imageId: post.imageId,
+        imageUrl: post.imageUrl,
       });
 
       if (!updatedPost) {
         toast({
-          title: "Uh oh! Failed to update post. Please try again",
+          title: `${action} post failed. Please try again.`,
         });
       }
       return navigate(`/posts/${post.$id}`);
     }
 
+    // ACTION = CREATE
     const newPost = await createPost({
-      ...values,
+      ...value,
       userId: user.id,
     });
 
     if (!newPost) {
       toast({
-        title: "Uh oh! Failed to create post. Please try again",
+        title: `${action} post failed. Please try again.`,
       });
     }
-
     navigate("/");
-  }
+  };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className='flex flex-col gap-9 w-full max-w-5xl'
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className='flex flex-col gap-9 w-full  max-w-5xl'
       >
         <FormField
           control={form.control}
@@ -107,6 +105,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='file'
@@ -117,13 +116,13 @@ const PostForm = ({ post, action }: PostFormProps) => {
                 <FileUploader
                   fieldChange={field.onChange}
                   mediaUrl={post?.imageUrl}
-                  // isVideo={post?.isVideo}
                 />
               </FormControl>
               <FormMessage className='shad-form_message' />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='location'
@@ -137,19 +136,20 @@ const PostForm = ({ post, action }: PostFormProps) => {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='tags'
           render={({ field }) => (
             <FormItem>
               <FormLabel className='shad-form_label'>
-                Add Tags (seperated by comma " , ")
+                Add Tags (separated by comma " , ")
               </FormLabel>
               <FormControl>
                 <Input
+                  placeholder='Art, Expression, Learn'
                   type='text'
                   className='shad-input'
-                  placeholder='Art, Expression, Learn'
                   {...field}
                 />
               </FormControl>
@@ -157,6 +157,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             </FormItem>
           )}
         />
+
         <div className='flex gap-4 items-center justify-end'>
           <Button
             type='button'
